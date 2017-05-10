@@ -1,0 +1,8 @@
+{
+    "require": {
+        "react/event-loop": "^0.4.3",
+        "react/stream": "^0.7.0",
+        "react/promise": "^2.5",
+        "react/datagram": "^1.1"
+    }
+}
