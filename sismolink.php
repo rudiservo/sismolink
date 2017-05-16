@@ -1,44 +1,44 @@
 <?php
 require 'vendor/autoload.php';
+include 'sismolink/sismolink.php';
+include 'sismolink/pusher.php';
+
+$sismo =  new sismolink\SismoLink(include 'config/config.php');
+
+$short_options ='';
+
+$long_options = [
+    'ip:',
+    'id:',
+    'name:',
+    'add-device',
+    'update-device',
+    'delete-device',
+    'start',
+    'verbose',
+    'websocket',
+    'webservice'
+];
 
 
+$options = getopt($short_options, $long_options);
 
-
-$loop = React\EventLoop\Factory::create();
-$factory = new React\Dns\Resolver\Factory();
-$resolver = $factory->createCached('8.8.8.8', $loop);
-$factory = new React\Datagram\Factory($loop, $resolver);
-addReactClient('localhost:9999', $factory, $loop);
-addReactClient('localhost:9998', $factory, $loop);
-$loop->run();
-
-function addReactClient($address, $factory, $loop)
-{
-    $factory->createClient($address)->then(function (React\Datagram\Socket $client) use ($loop) {
-        $client->send('first');
-        $client->on('message', function($message, $serverAddress, $client) {
-            echo 'received "' . $message . '" from ' . $serverAddress. PHP_EOL;
-        });
-        $client->on('error', function($error, $client) {
-            echo 'error: ' . $error->getMessage() . PHP_EOL;
-        });
-        $n = 0;
-        $tid = $loop->addPeriodicTimer(0.0, function() use ($client, &$n) {
-            $client->send('tick' . ++$n);
-        });
-        // read input from STDIN and forward everything to server
-        $loop->addReadStream(STDIN, function () use ($client, $loop, $tid) {
-            $msg = fgets(STDIN, 2000);
-            if ($msg === false) {
-                // EOF => flush client and stop perodic sending and waiting for input
-                $client->end();
-                $loop->cancelTimer($tid);
-                $loop->removeReadStream(STDIN);
-            } else {
-                $client->send(trim($msg));
-            }
-        });
-    }, function($error) {
-        echo 'ERROR: ' . $error->getMessage() . PHP_EOL;
-    });
+if ($options) {
+    if (array_key_exists('verbose', $options)) {
+        $sismo->verbose = true;
+    }
+    if (array_key_exists('add-device', $options) && array_key_exists('ip', $options) && array_key_exists('name', $options))  {
+        $sismo->addDevice($options['ip'], $options['name']);
+    } else if (array_key_exists('update-device', $options) && array_key_exists('id', $options) && array_key_exists('ip', $options) && array_key_exists('name', $options))  {
+        $sismo->updateDevice($options['id'], $options['ip'], $options['name']);
+    } else if (array_key_exists('delete-device', $options) && array_key_exists('id', $options))  {
+        $sismo->deleteDevice($options['id'], $options['ip'], $options['name']);
+    } else if (array_key_exists('start', $options)) {
+        $sismo->run();
+    } else if (array_key_exists('websocket', $options)) {
+        $sismo->startPusher();
+    }
+    else if (array_key_exists('webservice', $options)) {
+        $sismo->startWebService();
+    }
 }

@@ -1,0 +1,10 @@
+[Unit]
+Description=Sismolink - Sismographer log and transmition
+ 
+[Service]
+ExecStart=/opt/sismolink/sismolink --start
+StandardOutput=null
+ 
+[Install]
+WantedBy=multi-user.target
+Alias=sismolink.service
