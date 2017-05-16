@@ -12,7 +12,7 @@ return [
         'pass' => ''
     ],
     'server' => [
-        'ip' => '192.168.2.100',
+        'ip' => '192.168.40.125',
         'event_port' => 5678,
         'heartbeat_port' => 5679,
     ],
@@ -21,5 +21,5 @@ return [
         'port' => 5780
     ],
     'push_port' => 8081,
-    'webservice_port' => 9000, 
+    'webservice_port' => 9000,
 ];

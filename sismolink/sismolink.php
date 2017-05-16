@@ -135,7 +135,7 @@ class sismolink
 
     public function updateDevice($id, $ip, $name)
     {
-        $stm = $this->db->prepare('update devices set (ip, name) values (:i, :n) where id=:id');
+        $stm = $this->db->prepare('update devices set (ip, name) values (:ip, :n) where id=:id');
         $stm->execute(['ip' => $ip, 'n' => $name, 'id' => $id]);
     }
 
@@ -181,33 +181,4 @@ class sismolink
         $loop->run();
     }
     
-    public function startWebService()
-    {
-        
-        $app = function ($request, $response) {
-    $response->writeHead(200, array('Content-Type' => 'text/plain'));
-    $response->end("Hello World\n");
-};
-
-$loop = \React\EventLoop\Factory::create();
-$socket = new \React\Socket\Server($loop);
-$http = new \React\Http\Server($socket, $loop);
-
-$http->on('request', $app);
-echo "Server running at http://127.0.0.1:1337\n";
-
-$socket->listen(1337);
-$loop->run();
-        /*
-        $loop = \React\EventLoop\Factory::create();
-        $socket = new \React\Socket\Server($this->webservice_port, $loop);
-
-        $http = new \React\Http\Server($socket);
-        $http->on('request', function (Request $request, Response $response) {
-            $response->writeHead(200, array('Content-Type' => 'text/plain'));
-            $response->end("Hello World!\n");
-        });
-        $loop->run();
-        */
-    }
 }
